@@ -4,7 +4,8 @@ const { verifyToken } = require("../middlewares/verifyToken");
 const router = express.Router();
 
 router.get("/", verifyToken, (req, res) => {
-  res.json({
+  console.log("world");
+  return res.json({
     message: "user login successfully",
     user: req.user,
   });
