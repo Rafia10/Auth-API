@@ -3,7 +3,7 @@ const { body } = require("express-validator");
 const { userSignup } = require("../controller/userSignup");
 const { userLogin } = require("../controller/userLogin");
 const { verifyToken } = require("../middlewares/verifyToken");
-const { Logout } = require("../controller/userLogout");
+const { logout } = require("../controller/userLogout");
 const { logoutAll } = require("../controller/userLogoutAll");
 
 const router = express.Router();
@@ -22,7 +22,7 @@ router.post(
   userLogin
 );
 
-router.post("/logout", verifyToken, Logout);
+router.post("/logout", verifyToken, logout);
 
 router.post("/logoutAll", verifyToken, logoutAll);
 

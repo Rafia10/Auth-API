@@ -1,4 +1,4 @@
-async function Logout(req, res) {
+async function logout(req, res) {
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
       return token.token !== req.token;
@@ -10,4 +10,4 @@ async function Logout(req, res) {
     res.status(500).send(console.log(err));
   }
 }
-module.exports = { Logout };
+module.exports = { logout };
