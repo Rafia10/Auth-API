@@ -33,7 +33,7 @@ async function userSignup(req, res) {
   });
 
   const token = jwt.sign({ id: user.id }, "secretKey");
-
+  user.tokens = user.tokens.concat({ token });
   sendEmail(
     "noreply@gmail.com",
     user.email,
@@ -41,6 +41,7 @@ async function userSignup(req, res) {
     `${user.emailVerificationCode}`
   );
 
-  return res.status(201).json({ token });
+  return res.status(201).json({ user, token });
 }
+
 module.exports = { userSignup };

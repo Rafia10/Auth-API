@@ -1,34 +1,34 @@
 const jwt = require("jsonwebtoken");
 const User = require("../model/userSchema");
 
-function verifyToken(req, res, next) {
-  const bearerHeader = req.headers["authorization"]; //get auth verification header value
-  //check the type
-  if (!bearerHeader) {
-    return res.status(403).json({ error: "Authentication error" });
-  }
+const verifyToken = async (req, res, next) => {
+  try {
+    const token = req.headers["authorization"];
 
-  const bearer = bearerHeader.split(" "); //separate spaces
-  const bearerToken = bearer[1]; //get token from an array
-
-  jwt.verify(bearerToken, "secretKey", async (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: "Authentication error" });
+    //check the type
+    if (!token) {
+      return res.status(403).json({ error: "Authentication unsuccessful" });
     }
 
-    const existingUser = await User.findOne({ id: decoded.id }).select(
-      "-password -__v"
-    );
+    const bearerToken = token.split(" ")[1]; //separate spaces
 
-    if (!existingUser) {
-      return res.status(403).json({ message: "Authentication error" });
+    const decoded = jwt.verify(bearerToken, "secretKey");
+
+    const user = await User.findOne({
+      _id: decoded.id,
+      "tokens.token": bearerToken,
+    }).select("-password -__v");
+
+    if (!user) {
+      return res.status(401).send({ message: "User not found" });
     }
-
-    req.user = existingUser;
-
+    req.user = user;
+    req.token = bearerToken;
     next();
-  });
-}
+  } catch (error) {
+    res.status(401).send(error);
+  }
+};
 
 module.exports = {
   verifyToken,

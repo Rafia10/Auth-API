@@ -1,8 +1,15 @@
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const User = require("../model/userSchema");
 async function userLogin(req, res) {
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
@@ -21,12 +28,17 @@ async function userLogin(req, res) {
       },
       "secretKey"
     );
+    user.tokens = [...user.tokens, { token }];
+
+    await user.save();
 
     return res.json({
-      token: token,
+      user,
+      token,
     });
   } catch (error) {
-    res.status(500).send("Internal Server error Occured");
+    res.status(500).send(error);
   }
 }
+
 module.exports = { userLogin };

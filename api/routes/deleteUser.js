@@ -1,14 +1,12 @@
 const express = require("express");
+const { verifyToken } = require("../middlewares/verifyToken");
 const User = require("../model/userSchema");
-const router = express.Router();
-router.delete("/user/:id", async (req, res) => {
-  const user = await User.findByIdAndDelete(req.params.id);
 
+const router = express.Router();
+router.delete("/user/me", verifyToken, async (req, res) => {
   try {
-    if (!user) {
-      return res.status(404).send({ error: "User not found" });
-    }
-    res.send(user);
+    await req.user.remove();
+    res.send(req.user);
   } catch (err) {
     res.status(404).send(err);
   }
